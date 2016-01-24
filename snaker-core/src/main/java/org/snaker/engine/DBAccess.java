@@ -95,6 +95,12 @@ public interface DBAccess {
 	 * @param process 流程定义对象
 	 */
 	public void updateProcess(Process process);
+
+	/**
+	 * 删除流程定义对象
+	 * @param process 流程定义对象
+	 */
+	public void deleteProcess(Process process);
 	
 	/**
 	 * 更新流程定义类别
@@ -145,6 +151,18 @@ public interface DBAccess {
 	 * @param task 历史任务对象
 	 */
 	public void saveHistory(HistoryTask task);
+
+	/**
+	 * 删除历史实例记录
+	 * @param historyOrder 历史实例
+	 */
+	public void deleteHistoryOrder(HistoryOrder historyOrder);
+
+	/**
+	 * 删除历史任务记录
+	 * @param historyTask 历史任务
+	 */
+	public void deleteHistoryTask(HistoryTask historyTask);
 
     /**
      * 更新实例变量（包括历史实例表）
@@ -240,7 +258,7 @@ public interface DBAccess {
 	 * 根据流程实例id、参与者id获取抄送记录
 	 * @param orderId 活动流程实例id
 	 * @param actorIds 参与者id
-	 * @return
+	 * @return 传送记录列表
 	 */
 	public List<CCOrder> getCCOrder(String orderId, String... actorIds);
 	
@@ -260,7 +278,7 @@ public interface DBAccess {
 	
 	/**
 	 * 根据流程名称查询最近的版本号
-	 * @param name
+	 * @param name 流程名称
 	 * @return Integer 流程定义版本号
 	 */
 	public Integer getLatestProcessVersion(String name);
@@ -334,7 +352,7 @@ public interface DBAccess {
 	 * @param clazz 类型
 	 * @param sql sql语句
 	 * @param args 参数列表
-	 * @return
+	 * @return 结果对象
 	 */
 	public <T> T queryObject(Class<T> clazz, String sql, Object... args);
 	
@@ -343,7 +361,7 @@ public interface DBAccess {
 	 * @param clazz 类型
 	 * @param sql sql语句
 	 * @param args 参数列表
-	 * @return
+	 * @return 结果对象列表
 	 */
 	public <T> List<T> queryList(Class<T> clazz, String sql, Object... args);
 	
@@ -354,7 +372,7 @@ public interface DBAccess {
 	 * @param clazz 类型
 	 * @param sql sql语句
 	 * @param args 参数列表
-	 * @return
+	 * @return 结果对象列表
 	 */
 	public <T> List<T> queryList(Page<T> page, QueryFilter filter, Class<T> clazz, String sql, Object... args);
 

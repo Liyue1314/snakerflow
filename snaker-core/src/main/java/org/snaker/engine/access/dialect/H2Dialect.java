@@ -12,25 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package test.query;
+package org.snaker.engine.access.dialect;
 
-import org.junit.Test;
 import org.snaker.engine.access.Page;
-import org.snaker.engine.access.QueryFilter;
-import org.snaker.engine.entity.Task;
-import org.snaker.engine.entity.WorkItem;
-import org.snaker.engine.test.TestSnakerBase;
 
 /**
+ * H2数据库方言实现
  * @author yuqs
  * @since 1.0
  */
-public class TestQueryTask extends TestSnakerBase {
-	@Test
-	public void test() {
-		System.out.println(queryService.getActiveTasks(new Page<Task>(), 
-				new QueryFilter().setOperator("1")));
-		System.out.println(queryService.getWorkItems(new Page<WorkItem>(), 
-				new QueryFilter().setOperator("1").setOrderId("36c0228fcfa740d5b62682dc954eaecd")));
+public class H2Dialect implements Dialect {
+	/**
+	 * mysql分页通过limit实现
+	 */
+	public String getPageSql(String sql, Page<?> page) {
+		StringBuffer pageSql = new StringBuffer(sql.length() + 100);
+		pageSql.append(sql);
+		long start = (page.getPageNo() - 1) * page.getPageSize();
+		pageSql.append(" limit ").append(start).append(",").append(page.getPageSize());
+		return pageSql.toString();
 	}
 }

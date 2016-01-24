@@ -92,11 +92,12 @@ public class OrderService extends AccessService implements IOrderService {
     /**
 	 * 创建实例的抄送
 	 */
-	public void createCCOrder(String orderId, String... actorIds) {
+	public void createCCOrder(String orderId, String creator, String... actorIds) {
 		for(String actorId : actorIds) {
 			CCOrder ccorder = new CCOrder();
 			ccorder.setOrderId(orderId);
 			ccorder.setActorId(actorId);
+            ccorder.setCreator(creator);
 			ccorder.setStatus(STATE_ACTIVE);
             ccorder.setCreateTime(DateHelper.getTime());
 			access().saveCCOrder(ccorder);
@@ -114,7 +115,7 @@ public class OrderService extends AccessService implements IOrderService {
 	}
 	
 	/**
-	 * 更新活动实例的last_Updator、last_Update_Time、version、variable
+	 * 更新活动实例的last_Updator、last_Update_Time、expire_Time、version、variable
 	 */
 	public void updateOrder(Order order) {
 		access().updateOrder(order);
@@ -149,7 +150,7 @@ public class OrderService extends AccessService implements IOrderService {
 	 */
 	public void complete(String orderId) {
 		Order order = access().getOrder(orderId);
-		HistoryOrder history = new HistoryOrder(order);
+		HistoryOrder history = access().getHistOrder(orderId);
 		history.setOrderState(STATE_FINISH);
 		history.setEndTime(DateHelper.getTime());
 		
@@ -214,4 +215,35 @@ public class OrderService extends AccessService implements IOrderService {
         }
         return order;
     }
+
+	/**
+	 * 级联删除指定流程实例的所有数据：
+	 * 1.wf_order,wf_hist_order
+	 * 2.wf_task,wf_hist_task
+	 * 3.wf_task_actor,wf_hist_task_actor
+	 * 4.wf_cc_order
+	 * @param id 实例id
+	 */
+	public void cascadeRemove(String id) {
+		HistoryOrder historyOrder = access().getHistOrder(id);
+		AssertHelper.notNull(historyOrder);
+		List<Task> activeTasks = access().getActiveTasks(null, new QueryFilter().setOrderId(id));
+		List<HistoryTask> historyTasks = access().getHistoryTasks(null, new QueryFilter().setOrderId(id));
+		for(Task task : activeTasks) {
+			access().deleteTask(task);
+		}
+		for(HistoryTask historyTask : historyTasks) {
+			access().deleteHistoryTask(historyTask);
+		}
+		List<CCOrder> ccOrders = access().getCCOrder(id);
+		for(CCOrder ccOrder : ccOrders) {
+			access().deleteCCOrder(ccOrder);
+		}
+
+		Order order = access().getOrder(id);
+		access().deleteHistoryOrder(historyOrder);
+		if(order != null) {
+			access().deleteOrder(order);
+		}
+	}
 }

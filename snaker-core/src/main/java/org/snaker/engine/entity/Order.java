@@ -37,7 +37,7 @@ public class Order implements Serializable {
 	/**
 	 * 版本
 	 */
-	private Integer version;
+	private Integer version = 0;
 	/**
 	 * 流程定义ID
 	 */
@@ -82,10 +82,6 @@ public class Order implements Serializable {
      * 流程实例附属变量
      */
     private String variable;
-    /**
-     * 流程实例变量map集合
-     */
-    //private Map<String, Object> variableMap;
 
 	public String getProcessId() {
 		return processId;

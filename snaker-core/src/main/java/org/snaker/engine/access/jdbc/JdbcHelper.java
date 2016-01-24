@@ -330,17 +330,20 @@ public abstract class JdbcHelper {
         DatabaseMetaData databaseMetaData = conn.getMetaData();
         String databaseProductName = databaseMetaData.getDatabaseProductName();
         String dbType = databaseTypeMappings.getProperty(databaseProductName);
-        if(dbType == null || dbType.equalsIgnoreCase("mysql")) return new MySqlDialect();
+		if(StringHelper.isEmpty(dbType)) return null;
+        if(dbType.equalsIgnoreCase("mysql")) return new MySqlDialect();
         else if(dbType.equalsIgnoreCase("oracle")) return new OracleDialect();
         else if(dbType.equalsIgnoreCase("postgres")) return new PostgresqlDialect();
         else if(dbType.equalsIgnoreCase("mssql")) return new SQLServerDialect();
-        else return new MySqlDialect();
+		else if(dbType.equalsIgnoreCase("db2")) return new Db2Dialect();
+		else if(dbType.equalsIgnoreCase("h2")) return new H2Dialect();
+        else return null;
     }
 
     /**
      * 判断是否已经执行过脚本[暂时根据wf_process表是否有数据]
      * @param conn 数据库连接
-     * @return
+     * @return 是否执行成功
      */
     public static boolean isExec(Connection conn) {
         Statement stmt = null;
